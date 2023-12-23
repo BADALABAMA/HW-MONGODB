@@ -4,7 +4,7 @@ import { IUser } from '../../interfaces';
 export class User implements IUser {
   constructor(
     private id: string,
-    private login: string,
+    private email: string,
     private password: string,
     private userType: UserType
   ) {}
@@ -13,8 +13,8 @@ export class User implements IUser {
     return this.id;
   }
 
-  getLogin(): string {
-    return this.login;
+  getEmail(): string {
+    return this.email;
   }
 
   getPassword(): string {

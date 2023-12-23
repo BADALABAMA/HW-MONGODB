@@ -8,6 +8,7 @@ import {
   Header,
   Footer,
 } from '../../components';
+import { ModalWindow } from '../../components/modalWindow/Header/ModalWindow';
 import { Pagination } from '../../components/Pagination/Pagination';
 import { render } from '../../core';
 import { UserType } from '../../enums';
@@ -31,9 +32,17 @@ export class Application {
   private products: ProductsWrapper;
   private pagination: Pagination;
   private footer: Footer;
+  private modalWindow: ModalWindow;
 
   constructor() {
     this.app = document.getElementById('app');
+    this.header = new Header(
+      this.getSearchBtnEvents(),
+      this.getAdminPanelBtnEvents(),
+      this.getLoginBtnEvents(),
+      this.getCartBtnEvents()
+    );
+    this.modalWindow = new ModalWindow(this.addProductEvent());
 
     this.userController = new UserController();
     this.currentUser = undefined;
@@ -46,17 +55,32 @@ export class Application {
 
     this.products = new ProductsWrapper();
 
-    this.pagination = new Pagination(8);
-    this.header = new Header(
-      this.getSearchBtnEvents(),
-      this.getAdminPanelBtnEvents(),
-      this.getLoginBtnEvents(),
-      this.getCartBtnEvents()
-    );
+    this.pagination = new Pagination(this.header.getSearchInput().value);
+
     this.main = new Main({
       children: [this.products.getComponent(), this.pagination.getComponent()],
     });
     this.footer = new Footer();
+  }
+
+  addProductEvent() {
+    return {
+      click: () => {
+        this.productController.add(
+          this.modalWindow.getTitleInput().value,
+          true,
+          this.modalWindow.getDescriptionInput().value,
+          this.modalWindow.getPriceInput().value,
+          10,
+          'adidas',
+          './public/images/image.png'
+        );
+        if (this.modalWindow.getTitleInput().value !== '') {
+          this.modalWindow.reset();
+          this.run();
+        }
+      },
+    };
   }
 
   productsToCards(products: Product[]) {
@@ -104,6 +128,11 @@ export class Application {
 
     this.products.setProducts(cards);
   }
+  getShowProductEvent() {
+    return {
+      change: () => {},
+    };
+  }
 
   getBuyEvents() {
     // TODO: when the cart will be ready
@@ -124,15 +153,10 @@ export class Application {
           render(this.app, this.spinner.getComponent());
 
           console.log(this.currentUser);
-          if (this.currentUser.getUserType() === UserType.Admin) {
+          if (this.currentUser.getEmail() === 'admin@22.ua') {
             console.log('admin');
             setTimeout(() => {
               this.header.changeVisibility();
-              this.launchApp();
-            }, 2000);
-          } else if (this.currentUser.getUserType() !== UserType.Admin) {
-            console.log('guest');
-            setTimeout(() => {
               this.launchApp();
             }, 2000);
           }
@@ -147,9 +171,15 @@ export class Application {
   getSearchBtnEvents() {
     return {
       click: () => {
-        this.setDisplayedProducts(
-          this.productController.search(this.header.getSearchInput().value)
-        );
+        if (this.header.getSearchInput().value !== '') {
+          this.pagination.setMaxCount(this.header.getSearchInput().value);
+          this.setPagination(this.productController.getAll());
+          this.setDisplayedProducts(this.productController.getAll());
+        } else {
+          this.pagination.setMaxCount(this.header.getSearchInput().value + 20);
+          this.setPagination(this.productController.getAll());
+          this.setDisplayedProducts(this.productController.getAll());
+        }
       },
     };
   }
@@ -157,7 +187,15 @@ export class Application {
     return {};
   }
   getCartBtnEvents() {
-    return {};
+    return {
+      click: () => {
+        render(this.app, this.spinner.getComponent());
+
+        setTimeout(() => {
+          render(this.app, this.modalWindow.getComponent());
+        }, 2000);
+      },
+    };
   }
   getLoginBtnEvents() {
     return {
@@ -183,9 +221,6 @@ export class Application {
     ]);
 
     // this.app.append(this.pagination.getComponent());
-
-    this.setPagination(this.productController.getAll());
-    this.setDisplayedProducts(this.productController.getAll());
   }
 
   run() {

@@ -1,5 +1,5 @@
-import { Product, ProductRepository } from "..";
-import { getProducts } from "../../utils";
+import { Product, ProductRepository } from '..';
+import { getProducts } from '../../utils';
 
 export class ProductController {
   private productRepository: ProductRepository;

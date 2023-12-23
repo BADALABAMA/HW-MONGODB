@@ -2,7 +2,7 @@ import { UserType } from '../enums/UserType';
 
 export interface IUser {
   getId(): string;
-  getLogin(): string;
+  getEmail(): string;
   getPassword(): string;
   getUserType(): UserType;
 }

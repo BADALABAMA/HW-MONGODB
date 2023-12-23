@@ -1,7 +1,7 @@
-import { Component } from "../../core";
-import { IComponent } from "../../interfaces";
+import { Component } from '../../core';
+import { IComponent } from '../../interfaces';
 
-import "./Pagination.css";
+import './Pagination.css';
 
 export class Pagination implements IComponent {
   private component: Component;
@@ -15,7 +15,7 @@ export class Pagination implements IComponent {
     this.maxCount = maxCount;
 
     this.component = new Component({
-      className: "pagination",
+      className: 'pagination',
     });
   }
 
@@ -25,6 +25,10 @@ export class Pagination implements IComponent {
 
   getMaxCount() {
     return this.maxCount;
+  }
+
+  setMaxCount(value: number) {
+    return (this.maxCount = value);
   }
 
   getCurrentPage() {

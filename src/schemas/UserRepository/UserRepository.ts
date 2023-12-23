@@ -42,7 +42,7 @@ export class UserRepository implements IRepository<User> {
 
   getByLoginAndPassword(login: string, password: string) {
     return this.users.find(
-      (user) => user.getLogin() === login && user.getPassword() === password
+      (user) => user.getEmail() === login && user.getPassword() === password
     );
   }
 
@@ -66,7 +66,49 @@ export class UserRepository implements IRepository<User> {
     }
   }
 
+  async getUsersData() {
+    try {
+      const response = await fetch('http://localhost:3000/api/get-users');
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Error to fetching user data', error);
+      throw error;
+    }
+  }
+
+  async authenticateUser(email: string, password: string) {
+    try {
+      const userData = await this.getUsersData();
+      const user: User = userData.find((user: any) => user.email === email);
+      if (
+        user &&
+        user.getPassword() === password &&
+        user.getUserType() === UserType.Admin
+      ) {
+        return console.log(user.getEmail());
+      } else {
+        return null;
+      }
+    } catch (error) {
+      throw error;
+    }
+  }
+  async login(email: string, password: string) {
+    try {
+      const authenticatedUser = await this.authenticateUser(email, password);
+
+      if (authenticatedUser) {
+        console.log('Authentication successful:', authenticatedUser);
+      } else {
+        console.log('Authentication failed. Invalid email or password.');
+      }
+    } catch (error) {
+      console.error('Error during authentication:', error);
+    }
+  }
+
   validateEmailAndPassword(email: string, password: string) {
-    return this.getByLoginAndPassword(email, password);
+    return this.login(email, password);
   }
 }

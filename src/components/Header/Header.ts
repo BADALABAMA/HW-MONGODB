@@ -19,12 +19,12 @@ export class Header implements IComponent {
   ) {
     this.searchInput = new Input({
       attrs: {
-        placeholder: 'Search',
+        placeholder: 'Enter number of products to show',
         className: 'search__input',
       },
     });
     this.searchBtn = new Button({
-      textContent: 'Search',
+      textContent: 'Get Product',
       className: 'search__btn',
       events: searchBtnEvent,
     });
@@ -39,7 +39,7 @@ export class Header implements IComponent {
       events: loginBtnEvent,
     });
     this.cartBtn = new Button({
-      textContent: 'Cart',
+      textContent: 'add product',
       className: 'cart__btn',
       events: cartBtnEvent,
     });
